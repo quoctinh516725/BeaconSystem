@@ -8,13 +8,19 @@ export class UserRepository {
     });
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findByUsername(username: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { username },
+    });
+  }
+
+  async findById(id: string): Promise<User | null> {
     return prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async findByIds(id: number[]): Promise<User[]> {
+  async findByIds(id: string[]): Promise<User[]> {
     return prisma.user.findMany({
       where: { id: { in: id } },
     });
@@ -22,7 +28,7 @@ export class UserRepository {
 
   async create(data: {
     email: string;
-    name?: string;
+    username: string;
     password: string;
   }): Promise<User> {
     return prisma.user.create({
@@ -33,7 +39,7 @@ export class UserRepository {
   async findByEmailOrUsername(emailOrUsername: string): Promise<User | null> {
     return prisma.user.findFirst({
       where: {
-        OR: [{ email: emailOrUsername }, { name: emailOrUsername }],
+        OR: [{ email: emailOrUsername }, { username: emailOrUsername }],
       },
     });
   }

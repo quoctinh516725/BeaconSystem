@@ -8,24 +8,36 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   email     String   @unique
-  username  String?
+  username  String  @unique
   password  String?
   status    String   @default("ACTIVE")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  posts     Post[]
 
   @@map("users")
 }
 
-model IdempotencyKey {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  requestHash String
-  response    Json
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+model Post {
+  id        String      @id @default(uuid())
+  authorId  String
+  personId  String?
 
-  @@map("idempotency_keys")
+  title     String
+  hometown  String // Quê quán của thân nhân
+  location  String // Nơi ở hiện tại của thân nhân
+  description    String // Mô tả chi tiết về thân nhân, có thể bao gồm các đặc điểm nhận dạng, v.v.
+  lost_year Int // Năm mất tích của thân nhân
+  status    String   @default("PENDING") // Trạng thái của bài đăng PENDING, CONFIRMED, REJECTED
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+  @@index([personId])
+  
+  @@map("posts")
 }

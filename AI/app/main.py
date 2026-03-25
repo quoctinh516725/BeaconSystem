@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 
-from app.routers import product
+from AI.app.routers import embedding
+from AI.app.routers import search
 
 app = FastAPI()
 
-app.include_router(product.router)
+app.include_router(embedding.router )
+app.include_router(search.router)
 
 @app.get("/")
 def root():

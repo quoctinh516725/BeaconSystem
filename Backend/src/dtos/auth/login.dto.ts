@@ -7,7 +7,7 @@ export interface LoginRequestDto {
 }
 
 export interface UserInfoDto {
-  id: number;
+  id: string;
   username: string;
   email: string;
   fullName: string | null;
@@ -30,7 +30,7 @@ export const loginRequestDto = (data: any): LoginRequestDto => {
   if (!emailOrUsername) {
     errors.push("Vui lòng nhập email hoặc username!");
   }
-  
+
   if (!password || !AuthValidation.isValidPassword(password)) {
     errors.push("Password bị thiếu hoặc ít hơn 6 ký tự!");
   }
@@ -43,4 +43,3 @@ export const loginRequestDto = (data: any): LoginRequestDto => {
     password,
   };
 };
-

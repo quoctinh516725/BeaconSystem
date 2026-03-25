@@ -2,7 +2,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { env } from "../configs/env";
 
 export interface DecodedToken {
-  userId: number;
+  userId: string;
   email: string;
   jti?: string;
   iat?: number;
@@ -10,7 +10,7 @@ export interface DecodedToken {
 }
 
 export const generateAccessToken = (payload: {
-  userId: number;
+  userId: string;
   email: string;
 }): string => {
   const jti = Math.random().toString(36).substring(2);
@@ -24,7 +24,7 @@ export const generateAccessToken = (payload: {
 };
 
 export const generateRefreshToken = (payload: {
-  userId: number;
+  userId: string;
   email: string;
 }): string => {
   const jti = Math.random().toString(36).substring(2);

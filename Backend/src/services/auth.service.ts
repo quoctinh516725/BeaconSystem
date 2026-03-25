@@ -20,13 +20,18 @@ export class AuthService {
       throw new ConflictError("Email đã được sử dụng");
     }
 
+    const existingUsername = await userRepository.findByUsername(username);
+    if (existingUsername) {
+      throw new ConflictError("Username đã được sử dụng");
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
     const user = await userRepository.create({
       email,
-      name: username,
+      username,
       password: hashedPassword,
     });
 
@@ -43,7 +48,7 @@ export class AuthService {
     return {
       user: {
         id: user.id,
-        username: user.name || "",
+        username: user.username || "",
         email: user.email,
         fullName: null,
         avatarUrl: null,
@@ -87,7 +92,7 @@ export class AuthService {
     return {
       user: {
         id: user.id,
-        username: user.name || "",
+        username: user.username || "",
         email: user.email,
         fullName: null,
         avatarUrl: null,
