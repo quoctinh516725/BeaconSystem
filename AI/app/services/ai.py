@@ -12,9 +12,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 mtcnn = MTCNN(image_size=160, margin=10, keep_all=False, device=device)
 
 # Lấy bộ dữ liệu VGGFace2 đã được huấn luyện sẵn cho model InceptionResnetV1
-resnet = InceptionResnetV1(pretrained='vggface2').eval()
+resnet = InceptionResnetV1(pretrained='vggface2').to(device).eval()
 
 def extract_face(frame):
+    if frame is None:
+        raise HTTPException(status_code=400, detail="Không đọc được ảnh từ đường dẫn yêu cầu.")
+
     # InceptionResnetV1 yêu cầu định dạng màu là RGB, trong khi OpenCV đọc ảnh ở định dạng BGR
     img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -31,7 +34,7 @@ def extract_face(frame):
 
     if face_tensor is not None:
         return face_tensor.unsqueeze(0).to(device)  # Thêm batch dimension và chuyển sang device
-    return None
+    raise HTTPException(status_code=400, detail="Không phát hiện khuôn mặt trong ảnh.")
 
 def get_embedding(face_tensor):
     with torch.no_grad():

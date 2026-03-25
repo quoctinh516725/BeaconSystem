@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import uuid
-
 from app.database.db import Base
 from sqlalchemy import Column, DateTime,  String
 from sqlalchemy.orm import relationship
@@ -12,6 +11,7 @@ class Person(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String,  nullable=False)
+    age = Column(String)
     date_of_birth = Column(String)
     gender = Column(String)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))

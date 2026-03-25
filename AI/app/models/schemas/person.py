@@ -18,9 +18,3 @@ class PersonUpdate(BaseModel):
     age: Optional[int] = None
     gender: Optional[str] = None
     date_of_birth: Optional[datetime] = None
-
-class PersonResponse(PersonCreate):
-    id: str
-    embedding: list[float]
-    created_at: datetime
-
