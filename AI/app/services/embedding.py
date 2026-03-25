@@ -1,24 +1,24 @@
 import cv2
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from AI.app.config.faiss import get_faiss_manager
-from AI.app.services.ai import extract_face, get_embedding
-from AI.app.models.entities.person import Person
-from AI.app.models.entities.face_record import FaceRecord
+from app.utils.verifyImage import verify_image
+from app.config.faiss import get_faiss_manager
+from app.services.ai import extract_face, get_embedding
+from app.models.entities.person import Person
+from app.models.entities.face_record import FaceRecord
     
 # CREATE
 def create_person(db: Session, data):
-    image = cv2.imread(data.image_path)
-
+    image = verify_image(data.image_path)
     if image is None:
         raise HTTPException(status_code=400, detail="Không thể đọc ảnh từ đường dẫn đã cung cấp. Vui lòng kiểm tra lại đường dẫn và thử lại!")
-
+    
     face_tensor = extract_face(image)
 
     embedding = get_embedding(face_tensor)
     try:
         # Tạo bản ghi Person
-        person = Person(name=data.name, gender=data.gender, date_of_birth=data.date_of_birth)
+        person = Person(name=data.name, age=data.age, gender=data.gender, date_of_birth=data.date_of_birth)
         db.add(person)
         db.flush()  # Đẩy person vào DB để có ID trước khi tạo FaceRecord
 

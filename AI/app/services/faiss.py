@@ -4,7 +4,7 @@ import numpy as np
 import faiss
 
 class FaissManager:
-    def __init__(self, dim=128, index_path="storage/face_index.faiss", map_path="storage/id_map.pkl"):
+    def __init__(self, dim=512, index_path="storage/face_index.faiss", map_path="storage/id_map.pkl"):
         self.dim = dim
         self.index_path = index_path
         self.map_path = map_path
@@ -41,8 +41,8 @@ class FaissManager:
     
         for i, d in zip(indices[0], distances[0]):
             if i != -1 and i in self.id_map:
-                real_id = self.id_map[i]
+                person_id = self.id_map[i]
                 dist_score = float(d)
-                final_results.append((real_id, dist_score))
+                final_results.append((str(person_id), dist_score))
                 
         return final_results    

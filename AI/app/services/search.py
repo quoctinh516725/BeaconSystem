@@ -1,12 +1,11 @@
 import cv2
-from AI.app.config.faiss import get_faiss_manager
-from AI.app.services.ai import extract_face, get_embedding
-from AI.app.models.entities.person import Person
-from AI.app.models.entities.face_record import FaceRecord
+from app.config.faiss import get_faiss_manager
+from app.services.ai import extract_face, get_embedding
+from app.utils.verifyImage import verify_image
     
 # Search
 def search_embedding(data):
-    image = cv2.imread(data.image_path)
+    image = verify_image(data.image_path)
 
     if image is None:
         raise ValueError("Không đọc được ảnh từ đường dẫn yêu cầu.")

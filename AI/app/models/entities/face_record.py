@@ -14,7 +14,7 @@ class FaceRecord(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4, unique=True, nullable=False)
     person_id = Column(UUID(as_uuid=True), ForeignKey("persons.id"), index=True, nullable=False)
     image_path = Column(String, nullable=False)
-    embedding = Column(Vector(128), nullable=False)
+    embedding = Column(Vector(512), nullable=False)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     person = relationship("Person", back_populates="face_records")

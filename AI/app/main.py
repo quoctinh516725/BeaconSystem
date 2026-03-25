@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from AI.app.routers import embedding
-from AI.app.routers import search
+from app.routers import embedding
+from app.routers import search
 
 app = FastAPI()
 

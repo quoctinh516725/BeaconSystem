@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from AI.app.database.db import get_db
-from AI.app.models.schemas.person import PersonCreate, PersonUpdate
-from AI.app.services import embedding
+from app.database.db import get_db
+from app.models.schemas.person import PersonCreate, PersonUpdate
+from app.services import embedding
 router = APIRouter(prefix="/embedding")
 
 # Create Person and FaceRecord
