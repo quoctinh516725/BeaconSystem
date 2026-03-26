@@ -21,6 +21,7 @@ export type PostResponseDto = {
     username: string;
     phone: string;
   };
-}
+  similarPersons?: {};
+};
 
 export type PostListResponseDto = PaginatedResponseDto<PostResponseDto>;

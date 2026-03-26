@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
-import { NotFoundError, ValidationError } from "../error/AppError";
+import { ValidationError } from "../error/AppError";
 import { sendSuccess } from "../utils/response";
 import postService from "../services/post.service";
 import { validateCreatePostRequest } from "../dtos/post";
@@ -15,6 +15,7 @@ class PostController {
       if (!file) {
         throw new ValidationError("Vui lòng tải lên một hình ảnh");
       }
+      const data = validateCreatePostRequest(req.body);
 
       const result: any = await uploadStream(file, {
         folder: `beacons/posts/${userId}/images`,
@@ -26,12 +27,10 @@ class PostController {
         throw new Error("Lỗi khi tải lên hình ảnh");
       }
 
-      const data = validateCreatePostRequest({
-        ...req.body,
+      const createdPost = await postService.createPost(userId, {
+        ...data,
         image_url: result.secure_url,
       });
-
-      const createdPost = await postService.createPost(userId, data);
       sendSuccess(res, createdPost, "Tạo bài đăng thành công");
     },
   );

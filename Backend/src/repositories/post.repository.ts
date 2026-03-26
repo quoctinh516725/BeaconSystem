@@ -1,5 +1,5 @@
 import { prisma } from "../configs/prisma";
-import { postSelect } from "../types/post.type";
+import { PostResult, postSelect } from "../types/post.type";
 import { CreatePostRequestDto } from "../dtos/post";
 
 export class PostRepository {
@@ -36,7 +36,21 @@ export class PostRepository {
     return { data, total };
   };
 
-  create = async (data: CreatePostRequestDto & { authorId: string }) => {
+  findByPersonIds = async (personIds: string[]) => {
+    return prisma.post.findMany({
+      where: {
+        personId: {
+          in: personIds,
+        },
+      },
+      orderBy: { createdAt: "asc" },
+      select: postSelect,
+    });
+  };
+
+  create = async (
+    data: CreatePostRequestDto & { authorId: string },
+  ): Promise<PostResult> => {    
     return prisma.post.create({
       data,
       select: postSelect,

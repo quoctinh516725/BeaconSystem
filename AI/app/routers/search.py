@@ -9,6 +9,7 @@ router = APIRouter(prefix="/search")
 
 @router.post("/", response_model=SearchResponse)
 def search_face(data: SearchRequest, db: Session = Depends(get_db)):
+    print("Received search request with data:", data)
     try:
         search_results = search_embedding(data, db)
 

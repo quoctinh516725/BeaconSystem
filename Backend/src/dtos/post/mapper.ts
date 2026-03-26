@@ -1,8 +1,19 @@
 import { PostResult } from "../../types/post.type";
 import { PostResponseDto } from "./post.response.dto";
-import { CreatePostRequestDto, UpdatePostRequestDto } from "./post.request.dto";
+import { UpdatePostRequestDto } from "./post.request.dto";
 
-export const mapPostToResponse = (post: PostResult): PostResponseDto => {
+export const mapPostToResponse = (
+  post: PostResult & {
+    similarPersons?: {
+      personId: string;
+      postId: string;
+      image_url: string;
+      name: string;
+      age: number;
+      date_of_birth: Date | null;
+    }[];
+  },
+): PostResponseDto => {
   return {
     id: post.id,
     title: post.title,
@@ -23,24 +34,7 @@ export const mapPostToResponse = (post: PostResult): PostResponseDto => {
       username: post.author.username,
       phone: post.author.phone,
     },
-  };
-};
-
-export const mapCreatePostRequestToData = (dto: CreatePostRequestDto) => {
-  return {
-    title: dto.title,
-    age: dto.age,
-    name: dto.name,
-    gender: dto.gender,
-    location: dto.location,
-    status: dto.status,
-    image_url: dto.image_url,
-    description: dto.description,
-    createdAt: dto.createdAt,
-    personId: dto.personId,
-    date_of_birth: dto.date_of_birth,
-    hometown: dto.hometown,
-    lost_year: dto.lost_year,
+    similarPersons: post.similarPersons || [],
   };
 };
 
