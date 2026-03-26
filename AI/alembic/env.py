@@ -5,6 +5,7 @@ from sqlalchemy import pool
 from app.database.db import Base
 from app.models.entities.person import Person
 from app.models.entities.face_record import FaceRecord 
+from app.models.entities.id_mapping import IdMapping
 from alembic import context
 
 # this is the Alembic Config object, which provides

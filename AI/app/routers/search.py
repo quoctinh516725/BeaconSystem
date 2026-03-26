@@ -1,15 +1,16 @@
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from requests import Session
+from app.database.db import get_db
 from app.models.schemas.search import SearchRequest, SearchResponse
 from app.services.search import search_embedding
 
 router = APIRouter(prefix="/search")
 
 @router.post("/", response_model=SearchResponse)
-def search_face(data: SearchRequest):
+def search_face(data: SearchRequest, db: Session = Depends(get_db)):
     try:
-        search_results = search_embedding(data)  
-        print("haha: ", search_results)
+        search_results = search_embedding(data, db)
 
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))

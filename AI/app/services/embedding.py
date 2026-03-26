@@ -1,6 +1,8 @@
 import cv2
 from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
+from app.models.entities.id_mapping import IdMapping
+from app.utils.convert import convert_uuid_to_int
 from app.utils.verifyImage import verify_image
 from app.config.faiss import get_faiss_manager
 from app.services.ai import extract_face, get_embedding
@@ -28,11 +30,16 @@ def create_face_record_bg(person_id: str, image_path: str):
             image_path=image_path,
             embedding=embedding
         )
-        db.add(face_record)
-        db.commit()
 
-        faiss_manager = get_faiss_manager()
-        faiss_manager.add_vector(embedding, person_id)
+        faiss_id = convert_uuid_to_int(person_id)
+        id_mapping = IdMapping(faiss_id=faiss_id, person_id=person_id)
+
+        db.add(face_record)
+        db.add(id_mapping)
+        db.commit() 
+
+        faiss_manager = get_faiss_manager()      
+        faiss_manager.add_vector(embedding, faiss_id)
 
     except Exception as e:
         db.rollback()
@@ -47,6 +54,7 @@ def create_person(db: Session, data, background_tasks: BackgroundTasks):
     gender=data.gender,
     date_of_birth=data.date_of_birth
     )
+
     db.add(person)
     db.commit()
 

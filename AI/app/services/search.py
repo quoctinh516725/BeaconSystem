@@ -4,15 +4,21 @@ from app.services.ai import extract_face, get_embedding
 from app.utils.verifyImage import verify_image
     
 # Search
-def search_embedding(data):
+import time
+
+
+def search_embedding(data, db):
     image = verify_image(data.image_path)
 
     if image is None:
         raise ValueError("Không đọc được ảnh từ đường dẫn yêu cầu.")
-
+    
     face_tensor = extract_face(image)
 
     embedding = get_embedding(face_tensor)
+
     faiss_manager = get_faiss_manager()
 
-    return faiss_manager.search_vector(embedding, 5)
+    results = faiss_manager.search_vector(embedding, db, 5)
+    
+    return results
