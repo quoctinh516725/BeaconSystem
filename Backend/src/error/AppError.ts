@@ -9,6 +9,12 @@ export class AppError extends Error {
   }
 }
 
+export class HttpException extends AppError {
+  constructor(message: string, statusCode: number = 500) {
+    super(message, statusCode);
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(message: string) {
     super(message, 400);

@@ -13,6 +13,7 @@ class PersonCreate(BaseModel):
     image_path: str
     
 
+
 class PersonUpdate(BaseModel):
     name: Optional[str] = None
     age: Optional[int] = None

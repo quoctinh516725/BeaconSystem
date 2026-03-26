@@ -20,4 +20,5 @@ export const env = {
   NODE_ENV: required("NODE_ENV"),
   REDIS_URL: required("REDIS_URL"),
   FRONTEND_URL: required("FRONTEND_URL"),
+  AI_URL: required("AI_URL"),
 };

@@ -9,6 +9,7 @@ export class AuthService {
     email: string,
     username: string,
     password: string,
+    phone: string,
   ): Promise<{
     user: UserInfoDto;
     accessToken: string;
@@ -33,6 +34,7 @@ export class AuthService {
       email,
       username,
       password: hashedPassword,
+      phone,
     });
 
     // Generate tokens

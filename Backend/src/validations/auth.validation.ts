@@ -11,6 +11,11 @@ class AuthValidation {
   static isValidUsername(username: string): boolean {
     return username.length >= 3 && /^[a-zA-Z0-9_]+$/.test(username);
   }
+
+  static isValidPhone(phone: string): boolean {
+    const phoneRegex = /^[0-9]{10,11}$/;
+    return phoneRegex.test(phone);
+  }
 }
 
 export default AuthValidation;

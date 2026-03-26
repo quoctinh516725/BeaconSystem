@@ -6,6 +6,7 @@ export interface RegisterRequestDto {
   email: string;
   username: string;
   password: string;
+  phone: string;
 }
 
 export interface RegisterResponseDto {
@@ -17,7 +18,7 @@ export interface RegisterResponseDto {
 export const registerRequestDto = (
   data: RegisterRequestDto,
 ): RegisterRequestDto => {
-  const { email, username, password } = data;
+  const { email, username, password, phone } = data;
   const errors: string[] = [];
   if (!email || !AuthValidation.isValidEmail(email)) {
     errors.push("Email bị thiếu hoặc không hợp lệ!");
@@ -28,6 +29,9 @@ export const registerRequestDto = (
   if (!username || !AuthValidation.isValidUsername(username)) {
     errors.push("Username bị thiếu hoặc không hợp lệ!");
   }
+  if (!phone || !AuthValidation.isValidPhone(phone)) {
+    errors.push("Phone bị thiếu hoặc không hợp lệ!");
+  }
   if (errors.length > 0) {
     throw new ValidationError(errors.join(", "));
   }
@@ -35,8 +39,6 @@ export const registerRequestDto = (
     email,
     password,
     username,
+    phone,
   };
 };
-
-
-

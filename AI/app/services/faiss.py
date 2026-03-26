@@ -1,48 +1,46 @@
 import os
-import pickle
 import numpy as np
 import faiss
 
+from app.utils.convert import convert_uuid_to_int
+
 class FaissManager:
-    def __init__(self, dim=512, index_path="storage/face_index.faiss", map_path="storage/id_map.pkl"):
+    def __init__(self, dim=512, index_path="storage/face_index.faiss"):
         self.dim = dim
         self.index_path = index_path
-        self.map_path = map_path
         self.index = None
-        self.id_map = None
         self.load_index()
 
     def load_index(self):
-        if os.path.exists(self.index_path):
-            self.index = faiss.read_index(self.index_path)
+        if os.path.exists(self.index_path) and os.path.getsize(self.index_path) > 0:
+            try:
+                self.index = faiss.read_index(self.index_path)
+            except:
+                self.index = faiss.IndexIDMap(faiss.IndexFlatL2(self.dim))
         else:
-            self.index = faiss.IndexFlatL2(self.dim)
-            
-        if os.path.exists(self.map_path):
-            self.id_map = pickle.load(open(self.map_path, "rb"))
-        else:
-            self.id_map = {}
-
-    def save_index(self):
+            self.index = faiss.IndexIDMap(faiss.IndexFlatL2(self.dim))
+      
+    def save_index(self):           
         faiss.write_index(self.index, self.index_path)
-        pickle.dump(self.id_map, open(self.map_path, "wb"))
 
-    def add_vector(self, embedding, face_record_id):
+    def add_vector(self, embedding, person_id):
         vec = np.array(embedding, dtype="float32").reshape(1, -1)
-        idx = self.index.ntotal
-        self.index.add(vec)
-        self.id_map[idx] = face_record_id
+
+        faiss_id = convert_uuid_to_int(person_id)
+        ids = np.array([faiss_id], dtype="int64")
+        self.index.add_with_ids(vec, ids)
         self.save_index()
 
     def search_vector(self, embedding, k=5):
         query = np.array(embedding, dtype="float32").reshape(1, -1)
-        distances, indices = self.index.search(query, k)
+        distances, ids = self.index.search(query, k)
         final_results = []
     
-        for i, d in zip(indices[0], distances[0]):
-            if i != -1 and i in self.id_map:
-                person_id = self.id_map[i]
-                dist_score = float(d)
-                final_results.append((str(person_id), dist_score))
+        for i in range(len(ids[0])):    
+            person_id = ids[0][i]
+            dist_score = distances[0][i]
+
+            if person_id != -1:
+                final_results.append((str(person_id), float(dist_score)))
                 
         return final_results    

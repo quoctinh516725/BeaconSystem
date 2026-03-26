@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import uuid
 from app.database.db import Base
-from sqlalchemy import Column, DateTime,  String
+from sqlalchemy import Column, DateTime,  String, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -14,6 +14,8 @@ class Person(Base):
     age = Column(String)
     date_of_birth = Column(String)
     gender = Column(String)
+    hometown = Column(String, nullable=True)
+    lost_year = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     face_records = relationship("FaceRecord", back_populates="person", cascade="all, delete-orphan")

@@ -7,9 +7,9 @@ import { setRefreshTokenCookie } from "../utils/cookie";
 
 class AuthController {
   register = asyncHandler(async (req: Request, res: Response) => {
-    const { email, username, password } = registerRequestDto(req.body);
+    const { email, username, password, phone } = registerRequestDto(req.body);
 
-    const result = await authService.register(email, username, password);
+    const result = await authService.register(email, username, password, phone);
     const { refreshToken, ...userData } = result;
 
     setRefreshTokenCookie(res, refreshToken);

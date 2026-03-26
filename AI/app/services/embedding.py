@@ -1,48 +1,63 @@
 import cv2
-from fastapi import HTTPException
+from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.utils.verifyImage import verify_image
 from app.config.faiss import get_faiss_manager
 from app.services.ai import extract_face, get_embedding
 from app.models.entities.person import Person
 from app.models.entities.face_record import FaceRecord
-    
-# CREATE
-def create_person(db: Session, data):
-    image = verify_image(data.image_path)
-    if image is None:
-        raise HTTPException(status_code=400, detail="Không thể đọc ảnh từ đường dẫn đã cung cấp. Vui lòng kiểm tra lại đường dẫn và thử lại!")
-    
-    face_tensor = extract_face(image)
+from app.database.db import SessionLocal
 
-    embedding = get_embedding(face_tensor)
+def create_face_record_bg(person_id: str, image_path: str):
+    db = SessionLocal()
     try:
-        # Tạo bản ghi Person
-        person = Person(name=data.name, age=data.age, gender=data.gender, date_of_birth=data.date_of_birth)
-        db.add(person)
-        db.flush()  # Đẩy person vào DB để có ID trước khi tạo FaceRecord
+        image = verify_image(image_path)
+        if image is None:
+            print("[Background] Không đọc được ảnh")
+            return
 
-        # Tạo bản ghi FaceRecord liên kết với Person
-        face_record = FaceRecord(embedding=embedding, person_id=person.id, image_path=data.image_path)
+        face_tensor = extract_face(image)
+        if face_tensor is None:
+            print("[Background] Không phát hiện face")
+            return
+
+        embedding = get_embedding(face_tensor)
+
+        face_record = FaceRecord(
+            person_id=person_id,
+            image_path=image_path,
+            embedding=embedding
+        )
         db.add(face_record)
-
         db.commit()
-        db.refresh(person)
 
-        # Thêm embedding vào Faiss
         faiss_manager = get_faiss_manager()
-        faiss_manager.add_vector(embedding,person.id)
+        faiss_manager.add_vector(embedding, person_id)
 
-        return {
-            "id": person.id,
-            "name": person.name,
-            "embedding": embedding.tolist(),
-            "message": "Tạo hồ sơ thành công!"
-        }
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Đã xảy ra lỗi khi tạo hồ sơ: {str(e)}")
-   
+        print(f"[Background] Lỗi: {str(e)}")
+    finally:
+        db.close()
+
+def create_person(db: Session, data, background_tasks: BackgroundTasks):
+    person = Person(
+    name=data.name,
+    age=data.age,
+    gender=data.gender,
+    date_of_birth=data.date_of_birth
+    )
+    db.add(person)
+    db.commit()
+
+    # gọi background task
+    background_tasks.add_task(create_face_record_bg, str(person.id), data.image_path)
+
+    return {
+        "id": person.id,
+        "name": person.name,
+        "message": "Tạo hồ sơ thành công, embedding sẽ xử lý background."
+    }
   
 
 # UPDATE

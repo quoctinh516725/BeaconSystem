@@ -30,6 +30,7 @@ export class UserRepository {
     email: string;
     username: string;
     password: string;
+    phone: string;
   }): Promise<User> {
     return prisma.user.create({
       data,
