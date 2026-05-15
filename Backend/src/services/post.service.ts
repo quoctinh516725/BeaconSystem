@@ -52,6 +52,8 @@ class PostService {
       let listPendingPersonIds: string[] = [];
       if (searchData.length > 0) {
         for (const [id, score] of searchData) {
+          console.log("score: ",score);
+          
           if (score < 0.6) {
             personId = id;
             break;
