@@ -10,7 +10,8 @@ class PersonCreate(BaseModel):
     age: int
     gender: str
     date_of_birth: str
-    image_path: str
+    image_path: Optional[str] = None
+    image_base64: Optional[str] = None
     
 
 

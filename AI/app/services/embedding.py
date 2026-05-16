@@ -10,10 +10,10 @@ from app.models.entities.person import Person
 from app.models.entities.face_record import FaceRecord
 from app.database.db import SessionLocal
 
-def create_face_record_bg(person_id: str, image_path: str):
+def create_face_record_bg(person_id: str, image_path: str = None, image_base64: str = None):
     db = SessionLocal()
     try:
-        image = verify_image(image_path)
+        image = verify_image(image_path=image_path, image_base64=image_base64)
         if image is None:
             print("[Background] Không đọc được ảnh")
             return
@@ -27,7 +27,7 @@ def create_face_record_bg(person_id: str, image_path: str):
 
         face_record = FaceRecord(
             person_id=person_id,
-            image_path=image_path,
+            image_path=image_path if image_path else "pending_upload",
             embedding=embedding
         )
 
@@ -59,7 +59,7 @@ def create_person(db: Session, data, background_tasks: BackgroundTasks):
     db.commit()
 
     # gọi background task
-    background_tasks.add_task(create_face_record_bg, str(person.id), data.image_path)
+    background_tasks.add_task(create_face_record_bg, str(person.id), data.image_path, data.image_base64)
 
     return {
         "id": person.id,

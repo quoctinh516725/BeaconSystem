@@ -8,7 +8,7 @@ import time
 
 
 def search_embedding(data, db):
-    image = verify_image(data.image_path)
+    image = verify_image(image_path=data.image_path, image_base64=data.image_base64)
 
     if image is None:
         raise ValueError("Không đọc được ảnh từ đường dẫn yêu cầu.")

@@ -7,7 +7,7 @@ export const mapPostToResponse = (
     similarPersons?: {
       personId: string;
       postId: string;
-      image_url: string;
+      image_url: string | null;
       name: string;
       age: number;
       date_of_birth: Date | null;

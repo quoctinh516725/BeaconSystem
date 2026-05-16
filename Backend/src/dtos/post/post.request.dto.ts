@@ -7,7 +7,8 @@ export type CreatePostRequestDto = {
   name: string;
   gender: string;
   location: string;
-  image_url: string;
+  image_url?: string | null;
+  image_base64?: string;
   description: string;
   createdAt: Date;
 

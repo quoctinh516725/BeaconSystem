@@ -33,8 +33,8 @@ class PostService {
     }
 
     try {
-      const result = await axios.post<SearchResponse>(`${env.AI_URL}/search`, {
-        image_path: data.image_url,
+      const result = await axios.post<SearchResponse>(`${env.AI_URL}/search/`, {
+        image_base64: data.image_base64,
       });      
 
       const searchData = result.data.data;
@@ -51,9 +51,7 @@ class PostService {
       let personId: string | undefined = undefined;
       let listPendingPersonIds: string[] = [];
       if (searchData.length > 0) {
-        for (const [id, score] of searchData) {
-          console.log("score: ",score);
-          
+        for (const [id, score] of searchData) {          
           if (score < 0.6) {
             personId = id;
             break;
@@ -79,18 +77,19 @@ class PostService {
         name: data.name,
         title: data.title,
       };
+      
       if (personId) {
         createPostData.personId = personId;
         createPostData.status = PostStatus.CONFIRMED;
       } else if (listPendingPersonIds.length > 0) {
         createPostData.status = PostStatus.PENDING;
       } else {
-        const createdPerson: any = await axios.post(`${env.AI_URL}/embedding`, {
+        const createdPerson: any = await axios.post(`${env.AI_URL}/embedding/`, {
           name: data.name,
           age: data.age,
           gender: data.gender,
           date_of_birth: data.date_of_birth,
-          image_path: data.image_url,
+          image_base64: data.image_base64,
         });
 
         createPostData.personId = createdPerson.data.id;
@@ -98,19 +97,17 @@ class PostService {
       }
 
       let createdPost;
-try {
-  createdPost = await postRepository.create({
-    ...createPostData,
-    authorId: userId,
-  });
-  console.log("3: createdPost:", createdPost);
-} catch (err) {
-  console.error("Lỗi khi tạo post:", err);
-  throw err;
-}
-
-      
-
+      try {
+        
+        createdPost = await postRepository.create({
+          ...createPostData,
+          authorId: userId,
+        });
+        console.log("3: createdPost:", createdPost);
+      } catch (err) {
+        console.error("Lỗi khi tạo post:", err);
+        throw err;
+      }
       const similarPersons = listPendingPersonIds
         .map((id) => {
           const post = personPostMap.get(id);
@@ -129,13 +126,20 @@ try {
     } catch (error: any) {
       if (error.response) {
         const status = error.response.status;
+        let errorMessage = "Lỗi Server";
+        const detail = error.response.data?.detail;
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail) && detail.length > 0) {
+          errorMessage = detail[0].msg || detail[0].loc;
+        }
         throw new HttpException(
-          `Lỗi khi tìm kiếm đặc điểm nhận dạng: ${error.response.data?.detail[0]?.loc || "Lỗi Server"}`,
+          `Lỗi khi tìm kiếm đặc điểm nhận dạng: ${errorMessage}`,
           status,
         );
       }
       throw new HttpException(
-        `Lỗi khi tìm kiếm đặc điểm nhận dạng: ${error.response.data?.detail[0]?.loc || "Lỗi Server"}`,
+        `Lỗi khi tìm kiếm đặc điểm nhận dạng: Lỗi Server`,
         500,
       );
     }

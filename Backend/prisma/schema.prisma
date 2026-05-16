@@ -37,7 +37,7 @@ model Post {
   name          String
   age           Int
   gender        String
-  image_url     String
+  image_url     String?
   date_of_birth DateTime?
 
   lost_year   Int? // Năm mất tích của thân nhân

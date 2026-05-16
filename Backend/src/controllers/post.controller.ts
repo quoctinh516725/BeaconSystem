@@ -17,20 +17,24 @@ class PostController {
       }
       const data = validateCreatePostRequest(req.body);
 
-      const result: any = await uploadStream(file, {
-        folder: `beacons/posts/${userId}/images`,
-        publicId: `post_${Date.now()}_${Math.random()}`,
-        overwrite: false,
-      });
-
-      if (!result || !result.secure_url) {
-        throw new Error("Lỗi khi tải lên hình ảnh");
-      }
+      const fileBufferBase64 = file.buffer.toString("base64");
 
       const createdPost = await postService.createPost(userId, {
         ...data,
-        image_url: result.secure_url,
+        image_base64: fileBufferBase64,
+        image_url: null, // Sẽ được update sau bằng worker
       });
+
+      // Thêm job vào queue để upload ảnh
+      const { imageUploadQueue } = await import("../configs/queue");
+      await imageUploadQueue.add("upload-image", {
+        postId: createdPost.id,
+        userId: userId,
+        fileBufferBase64: fileBufferBase64,
+        originalName: file.originalname,
+        mimetype: file.mimetype,
+      });
+
       sendSuccess(res, createdPost, "Tạo bài đăng thành công");
     },
   );

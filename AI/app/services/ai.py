@@ -25,10 +25,24 @@ def extract_face(frame):
     img_pil = Image.fromarray(img_rgb)
 
     # Nếu phát hiện 2 mặt trở lên bao lỗi
-    boxes, _ = mtcnn.detect(img_pil)
+    boxes, probs = mtcnn.detect(img_pil)
 
-    if boxes is not None and len(boxes) > 1:
-        raise HTTPException(status_code=400, detail=f"Phát hiện {len(boxes)} gương mặt. Vui lòng cung cấp ảnh chỉ có một gương mặt.")
+    if boxes is not None and probs is not None:
+        # Lọc các box có độ tin cậy > 0.90
+        valid_boxes = [box for box, p in zip(boxes, probs) if p is not None and p > 0.90]
+        
+        if len(valid_boxes) > 1:
+            # Tính diện tích các khuôn mặt (x2 - x1) * (y2 - y1)
+            areas = [(box[2] - box[0]) * (box[3] - box[1]) for box in valid_boxes]
+            areas.sort(reverse=True)
+            
+            # Nếu khuôn mặt to nhất không lớn hơn hẳn (ví dụ 3 lần) khuôn mặt thứ 2, thì từ chối
+            # (Tránh trường hợp ảnh chụp nhóm không biết ai là chính)
+            if areas[0] < 3 * areas[1]:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Phát hiện nhiều gương mặt có kích thước tương đương nhau. Vui lòng cung cấp ảnh chỉ có một gương mặt rõ ràng."
+                )
 
     face_tensor = mtcnn(img_pil)
 

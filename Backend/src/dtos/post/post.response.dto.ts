@@ -12,7 +12,7 @@ export type PostResponseDto = {
   location: string;
   lost_year: number | null;
   status: string;
-  image_url: string;
+  image_url: string | null;
   description: string;
   createdAt: Date;
   personId: string | null;
