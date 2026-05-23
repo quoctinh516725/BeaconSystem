@@ -1,15 +1,15 @@
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+RUN npm ci
+
 COPY . .
-CMD ["npm", "run", "build"]
+
+# Build the Next.js application (generates static files in /app/out)
+RUN npm run build
+
+# When the container starts, copy the static files to the mounted volume
+CMD ["sh", "-c", "cp -a /app/out/. /app/dist/"]

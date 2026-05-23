@@ -2,10 +2,12 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Cài đặt các thư viện hệ thống cần thiết cho OpenCV và compile
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+# Cài đặt các thư viện hệ thống cần thiết cho OpenCV, psycopg2 và compile
+RUN apt-get update --allow-releaseinfo-change && \
+    apt-get install -y --no-install-recommends \
+    libgl1 \
     libglib2.0-0 \
+    libpq-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 

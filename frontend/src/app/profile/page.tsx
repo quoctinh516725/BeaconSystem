@@ -47,7 +47,7 @@ export default function ProfilePage() {
       if (formData.phone !== user.phone) submitData.append("phone", formData.phone);
       if (formData.password) submitData.append("password", formData.password);
 
-      const response = await fetch("http://localhost:3001/api/users/profile", {
+      const response = await fetch("/api/users/profile", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`

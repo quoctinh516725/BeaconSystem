@@ -26,7 +26,7 @@ export default function PostsPage() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/api/posts?page=1&limit=20", {
+        const response = await fetch("/api/posts?page=1&limit=20", {
           signal: abortController.signal
         });
         

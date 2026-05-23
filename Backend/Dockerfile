@@ -2,6 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Cài đặt openssl phục vụ cho Prisma Client
+RUN apk add --no-cache openssl
+
 # Copy file cấu hình package và cài đặt dependencies
 COPY package*.json ./
 RUN npm install
@@ -10,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Tạo Prisma Client
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma generate
 
 EXPOSE 3001
 

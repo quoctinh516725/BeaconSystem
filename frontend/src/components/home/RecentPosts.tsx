@@ -57,7 +57,7 @@ export default function RecentPosts() {
       try {
         setLoading(true);
         // Tạm thời gọi API lấy số lượng lớn để chia làm 2 list
-        const response = await fetch("http://localhost:3001/api/posts?page=1&limit=20");
+        const response = await fetch("/api/posts?page=1&limit=20");
         const result = await response.json();
 
         if (response.ok && result.data?.data) {

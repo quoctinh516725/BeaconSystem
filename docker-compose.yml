@@ -1,6 +1,13 @@
-version: '3.8'
-
 services:
+  # Module Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: beacons_frontend
+    volumes:
+      - /var/www/Beacons:/app/dist
+
   # Module Backend (Node.js)
   backend:
     build:
@@ -13,6 +20,7 @@ services:
       # Override các URL nội bộ trong docker network
       - REDIS_URL=redis://redis:6379
       - AI_URL=http://ai:8000
+      - FRONTEND_URL=http://localhost:3000
     env_file:
       - ./Backend/.env
     depends_on:
