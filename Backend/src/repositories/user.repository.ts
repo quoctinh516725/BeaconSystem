@@ -37,6 +37,13 @@ export class UserRepository {
     });
   }
 
+  async update(id: string, data: Partial<User>): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data,
+    });
+  }
+
   async findByEmailOrUsername(emailOrUsername: string): Promise<User | null> {
     return prisma.user.findFirst({
       where: {

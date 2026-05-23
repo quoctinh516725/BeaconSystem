@@ -11,9 +11,9 @@ router.get("/", validatePagination, postController.getPosts);
 router.get("/:id", postController.getPostById);
 
 // Authenticated write routes
-// Tạm thời bỏ qua authenticate để test
-// router.use(authenticate); 
+router.use(authenticate); 
 router.post("/", upload.single("image"), postController.createPost);
+router.patch("/:id/confirm", postController.confirmPost);
 router.put("/:id", postController.updatePost);
 router.delete("/:id", postController.deletePost);
 

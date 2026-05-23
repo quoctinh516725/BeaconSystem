@@ -90,6 +90,23 @@ class PostController {
       sendSuccess(res, posts, "Lấy danh sách bài đăng thành công");
     },
   );
+
+  confirmPost = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.userId!;
+      const postId = req.params.id;
+      if (!postId) {
+        throw new ValidationError("Vui lòng cung cấp ID của bài đăng");
+      }
+
+      const result = await postService.confirmPost(
+        postId as string,
+        userId,
+        req.body,
+      );
+      sendSuccess(res, result, "Xác nhận bài đăng thành công");
+    },
+  );
 }
 
 export default new PostController();

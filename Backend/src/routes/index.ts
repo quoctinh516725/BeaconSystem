@@ -1,10 +1,14 @@
 import { Router } from "express";
-import authRoute from "./auth.route";
-import postRoute from "./post.route";
+import authRoutes from "./auth.route";
+import postRoutes from "./post.route";
+import searchRoutes from "./search.route";
+import userRoutes from "./user.route";
 
-const route = Router();
+const router = Router();
 
-route.use("/auth", authRoute);
-route.use("/posts", postRoute);
+router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
+router.use("/posts", postRoutes);
+router.use("/search", searchRoutes);
 
-export default route;
+export default router;

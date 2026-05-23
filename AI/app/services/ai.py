@@ -4,6 +4,7 @@ import torch
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from PIL import Image
 from scipy.spatial.distance import cosine
+import matplotlib.pyplot as plt
 
 # Kiểm tra nếu có GPU thì dùng, không thì dùng CPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -45,6 +46,7 @@ def extract_face(frame):
                 )
 
     face_tensor = mtcnn(img_pil)
+    
 
     if face_tensor is not None:
         return face_tensor.unsqueeze(0).to(device)  # Thêm batch dimension và chuyển sang device
@@ -54,4 +56,4 @@ def get_embedding(face_tensor):
     with torch.no_grad():
         emb = resnet(face_tensor)
     return emb[0].cpu().numpy()  # trả về embedding dưới dạng numpy array
-
+    

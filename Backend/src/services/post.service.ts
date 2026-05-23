@@ -50,18 +50,20 @@ class PostService {
 
       let personId: string | undefined = undefined;
       let listPendingPersonIds: string[] = [];
+      
       if (searchData.length > 0) {
         for (const [id, score] of searchData) {          
           if (score < 0.6) {
             personId = id;
             break;
-          } else if (score < 1.0) {
+          } else if (score < 0.8) {
             listPendingPersonIds.push(id);
           } else {
             break;
           }
         }
       }
+      console.log("scoresearchData:", searchData);
 
       const createPostData: any = {
         age: Number(data.age),
@@ -118,6 +120,11 @@ class PostService {
             image_url: post.image_url,
             name: post.name,
             age: post.age,
+            gender: post.gender,
+            hometown: post.hometown,
+            location: post.location,
+            lost_year: post.lost_year,
+            description: post.description,
             date_of_birth: post.date_of_birth,
           };
         })
@@ -206,23 +213,52 @@ class PostService {
     return mapPostToResponse(updatedPost);
   };
 
-  deletePost = async (postId: string, userId: string): Promise<void> => {
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      throw new NotFoundError("Người dùng không tồn tại");
-    }
+  confirmPost = async (
+    postId: string,
+    userId: string,
+    data: { personId: string | null; image_base64?: string },
+  ): Promise<PostResponseDto> => {
+    const post = await postRepository.findById(postId);
 
-    const existingPost = await postRepository.findBasicInfoById(postId);
-
-    if (!existingPost) {
+    if (!post) {
       throw new NotFoundError("Bài đăng không tồn tại");
     }
 
-    if (existingPost.authorId !== userId) {
-      throw new ForbiddenError("Bạn không có quyền xóa bài đăng này");
+    if (post.author.id !== userId) {
+      throw new ForbiddenError("Bạn không có quyền thực hiện hành động này");
     }
 
-    await postRepository.delete(postId);
+    let finalPersonId = data.personId;
+
+    // Nếu người dùng reject (personId === null), gọi AI để tạo định danh (person) mới
+    if (!finalPersonId) {
+      if (!data.image_base64) {
+        throw new ValidationError("Thiếu dữ liệu hình ảnh để tạo định danh mới");
+      }
+
+      try {
+        const createdPerson: any = await axios.post(`${env.AI_URL}/embedding/`, {
+          name: post.name,
+          age: post.age,
+          gender: post.gender,
+          date_of_birth: post.date_of_birth,
+          image_base64: data.image_base64,
+        });
+
+        finalPersonId = createdPerson.data.id;
+      } catch (error: any) {
+        console.error("Lỗi khi tạo định danh mới tại AI Service:", error);
+        throw new HttpException("Lỗi kết nối với AI Service khi tạo định danh mới", 500);
+      }
+    }
+
+    // Cập nhật bài đăng với personId chính xác và chuyển status sang CONFIRMED
+    const updatedPost = await postRepository.update(postId, {
+      personId: finalPersonId,
+      status: PostStatus.CONFIRMED,
+    } as any);
+
+    return mapPostToResponse(updatedPost);
   };
 }
 export default new PostService();
