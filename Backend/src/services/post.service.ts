@@ -63,7 +63,6 @@ class PostService {
           }
         }
       }
-      console.log("scoresearchData:", searchData);
 
       const createPostData: any = {
         age: Number(data.age),
@@ -93,19 +92,17 @@ class PostService {
           date_of_birth: data.date_of_birth,
           image_base64: data.image_base64,
         });
-
         createPostData.personId = createdPerson.data.id;
         createPostData.status = PostStatus.CONFIRMED;
       }
 
       let createdPost;
       try {
-        
         createdPost = await postRepository.create({
           ...createPostData,
+          pendingPersonIds: listPendingPersonIds,
           authorId: userId,
         });
-        console.log("3: createdPost:", createdPost);
       } catch (err) {
         console.error("Lỗi khi tạo post:", err);
         throw err;
@@ -182,6 +179,23 @@ class PostService {
     };
   };
 
+  getMyPosts = async (
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<PostListResponseDto> => {
+    const { data, total } = await postRepository.findMyPosts(userId, page, limit);
+
+    return {
+      data: data.map(mapPostToResponse),
+      pagination: {
+        page,
+        limit,
+        total,
+      },
+    };
+  };
+
   updatePost = async (
     postId: string,
     data: UpdatePostRequestDto,
@@ -213,6 +227,20 @@ class PostService {
     return mapPostToResponse(updatedPost);
   };
 
+  deletePost = async (postId: string, userId: string): Promise<void> => {
+    const existingPost = await postRepository.findBasicInfoById(postId);
+
+    if (!existingPost) {
+      throw new NotFoundError("Bài đăng không tồn tại");
+    }
+
+    if (existingPost.authorId !== userId) {
+      throw new ForbiddenError("Bạn không có quyền xóa bài đăng này");
+    }
+
+    await postRepository.delete(postId);
+  };
+
   confirmPost = async (
     postId: string,
     userId: string,
@@ -232,8 +260,19 @@ class PostService {
 
     // Nếu người dùng reject (personId === null), gọi AI để tạo định danh (person) mới
     if (!finalPersonId) {
-      if (!data.image_base64) {
-        throw new ValidationError("Thiếu dữ liệu hình ảnh để tạo định danh mới");
+      let image_base64 = data.image_base64;
+      
+      if (!image_base64) {
+        if (!post.image_url) {
+          throw new ValidationError("Thiếu dữ liệu hình ảnh để tạo định danh mới");
+        }
+        try {
+          const response = await axios.get(post.image_url, { responseType: 'arraybuffer' });
+          image_base64 = Buffer.from(response.data, 'binary').toString('base64');
+        } catch (error) {
+          console.error("Lỗi khi tải ảnh từ URL:", error);
+          throw new HttpException("Không thể tải ảnh của bài đăng để tạo định danh", 500);
+        }
       }
 
       try {
@@ -242,7 +281,7 @@ class PostService {
           age: post.age,
           gender: post.gender,
           date_of_birth: post.date_of_birth,
-          image_base64: data.image_base64,
+          image_base64: image_base64,
         });
 
         finalPersonId = createdPerson.data.id;
@@ -259,6 +298,49 @@ class PostService {
     } as any);
 
     return mapPostToResponse(updatedPost);
+  };
+
+  getSimilarPersons = async (postId: string, userId: string): Promise<any[]> => {
+    const post = await postRepository.findById(postId);
+    if (!post) {
+      throw new NotFoundError("Bài đăng không tồn tại");
+    }
+    if (post.author.id !== userId) {
+      throw new ForbiddenError("Bạn không có quyền thực hiện hành động này");
+    }
+
+    try {
+      const listPendingPersonIds = (post as any).pendingPersonIds || [];
+      if (listPendingPersonIds.length === 0) return [];
+
+      const postData = await postRepository.findByPersonIds(listPendingPersonIds);
+
+      
+      const personPostMap = new Map(postData.map((p) => [p.personId, p]));
+
+      return listPendingPersonIds
+        .map((id: string) => {
+          const p = personPostMap.get(id);
+          if (!p) return null;
+          return {
+            personId: id,
+            postId: p.id,
+            image_url: p.image_url,
+            name: p.name,
+            age: p.age,
+            gender: p.gender,
+            hometown: p.hometown,
+            location: p.location,
+            lost_year: p.lost_year,
+            description: p.description,
+            date_of_birth: p.date_of_birth,
+          };
+        })
+        .filter((item: any) => item !== null);
+    } catch (error: any) {
+      console.error("Lỗi khi tìm kiếm người giống:", error);
+      throw new HttpException("Lỗi khi tra cứu danh sách người giống", 500);
+    }
   };
 }
 export default new PostService();

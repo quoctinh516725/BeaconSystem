@@ -91,6 +91,15 @@ class PostController {
     },
   );
 
+  getMyPosts = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.userId!;
+      const { page, limit } = req.pagination!;
+      const posts = await postService.getMyPosts(userId, page, limit);
+      sendSuccess(res, posts, "Lấy danh sách bài đăng của tôi thành công");
+    },
+  );
+
   confirmPost = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       const userId = req.user?.userId!;
@@ -105,6 +114,19 @@ class PostController {
         req.body,
       );
       sendSuccess(res, result, "Xác nhận bài đăng thành công");
+    },
+  );
+
+  getSimilarPersons = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const userId = req.user?.userId!;
+      const postId = req.params.id as string;
+      if (!postId) {
+        throw new ValidationError("Vui lòng cung cấp ID của bài đăng");
+      }
+
+      const result = await postService.getSimilarPersons(postId, userId);
+      sendSuccess(res, result, "Lấy danh sách người giống thành công");
     },
   );
 }

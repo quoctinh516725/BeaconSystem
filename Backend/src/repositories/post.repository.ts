@@ -25,12 +25,32 @@ export class PostRepository {
 
     const [data, total] = await Promise.all([
       prisma.post.findMany({
+        where: { status: "CONFIRMED" },
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
         select: postSelect,
       }),
-      prisma.post.count(),
+      prisma.post.count({
+        where: { status: "CONFIRMED" }
+      }),
+    ]);
+
+    return { data, total };
+  };
+
+  findMyPosts = async (authorId: string, page: number, limit: number) => {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      prisma.post.findMany({
+        where: { authorId },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: postSelect,
+      }),
+      prisma.post.count({ where: { authorId } }),
     ]);
 
     return { data, total };

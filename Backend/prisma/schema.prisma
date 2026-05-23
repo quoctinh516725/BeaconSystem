@@ -28,9 +28,10 @@ model User {
 }
 
 model Post {
-  id       String  @id @default(uuid())
-  authorId String
-  personId String?
+  id               String   @id @default(uuid())
+  authorId         String
+  personId         String?
+  pendingPersonIds String[] @default([])
 
   title String
 

@@ -2,9 +2,6 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Cài đặt openssl phục vụ cho Prisma Client
-RUN apk add --no-cache openssl
-
 # Copy file cấu hình package và cài đặt dependencies
 COPY package*.json ./
 RUN npm install

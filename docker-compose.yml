@@ -33,15 +33,6 @@ services:
       - ./AI/.env
     networks:
       - beacons_net
-    # Nếu máy bạn (host) có GPU Nvidia và đã cài nvidia-container-toolkit, 
-    # có thể bỏ comment đoạn dưới đây để dùng GPU tăng tốc AI:
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
 
   # Redis Database (Dành cho BullMQ)
   redis:

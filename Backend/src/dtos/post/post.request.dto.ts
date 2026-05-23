@@ -169,8 +169,13 @@ export const validateUpdatePostRequest = (
     errors.push("Vui lòng nhập mô tả chi tiết đặc điểm nhận dạng");
   }
 
-  if (data.date_of_birth !== undefined && isNaN(data.date_of_birth.getTime())) {
-    errors.push("Vui lòng nhập ngày sinh hợp lệ");
+  if (data.date_of_birth !== undefined) {
+    const d = new Date(data.date_of_birth);
+    if (isNaN(d.getTime())) {
+      errors.push("Vui lòng nhập ngày sinh hợp lệ");
+    } else {
+      data.date_of_birth = d;
+    }
   }
 
   if (

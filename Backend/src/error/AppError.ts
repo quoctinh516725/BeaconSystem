@@ -45,3 +45,9 @@ export class LimitError extends AppError {
     super(message, 429);
   }
 }
+
+export class BadRequestError extends AppError {
+  constructor(message: string) {
+    super(message, 400);
+  }
+}

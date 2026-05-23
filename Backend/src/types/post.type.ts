@@ -23,6 +23,7 @@ export const postSelect = {
       phone: true,
     },
   },
+  pendingPersonIds: true
 } satisfies Prisma.PostSelect;
 
 export type PostResult = Prisma.PostGetPayload<{ select: typeof postSelect }>;
