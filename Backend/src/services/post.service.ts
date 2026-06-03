@@ -267,8 +267,10 @@ class PostService {
           throw new ValidationError("Thiếu dữ liệu hình ảnh để tạo định danh mới");
         }
         try {
-          const response = await axios.get(post.image_url, { responseType: 'arraybuffer' });
-          image_base64 = Buffer.from(response.data, 'binary').toString('base64');
+          const response = await axios.get<ArrayBuffer>(post.image_url, {
+            responseType: "arraybuffer",
+          });
+          image_base64 = Buffer.from(response.data).toString("base64");
         } catch (error) {
           console.error("Lỗi khi tải ảnh từ URL:", error);
           throw new HttpException("Không thể tải ảnh của bài đăng để tạo định danh", 500);
