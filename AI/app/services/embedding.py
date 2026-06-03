@@ -36,9 +36,9 @@ def create_face_record_bg(person_id: str, image_path: str = None, image_base64: 
 
         db.add(face_record)
         db.add(id_mapping)
-        db.commit() 
+        db.commit()
 
-        faiss_manager = get_faiss_manager()      
+        faiss_manager = get_faiss_manager()   
         faiss_manager.add_vector(embedding, faiss_id)
 
     except Exception as e:

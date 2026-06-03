@@ -46,12 +46,11 @@ def extract_face(frame):
                 )
 
     face_tensor = mtcnn(img_pil)
-    
 
     if face_tensor is not None:
         return face_tensor.unsqueeze(0).to(device)  # Thêm batch dimension và chuyển sang device
     raise HTTPException(status_code=400, detail="Không phát hiện khuôn mặt trong ảnh.")
-
+    
 def get_embedding(face_tensor):
     with torch.no_grad():
         emb = resnet(face_tensor)
