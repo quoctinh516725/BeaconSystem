@@ -23,7 +23,7 @@ export default function HeroBanner() {
         {/* Main Slogan - Changed to font-sans per user request */}
         <h1 className="mb-6 font-sans text-5xl font-extrabold tracking-tight leading-tight sm:text-6xl md:text-7xl lg:text-8xl sm:leading-tight md:leading-tight lg:leading-30 drop-shadow-lg">
           Thắp Sáng Hy Vọng<br className="hidden sm:block" />
-          <span className="text-gold">Kếttt Nối Tình Thân</span>
+          <span className="text-gold">Kết Nối Tình Thân</span>
         </h1>
         
         {/* Sub-slogan */}
