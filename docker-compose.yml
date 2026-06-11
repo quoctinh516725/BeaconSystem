@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: beacons_backend
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     environment:
       # Override các URL nội bộ trong docker network
       - REDIS_URL=redis://redis:6379
@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: beacons_ai
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     env_file:
       - ./AI/.env
     networks:
@@ -47,7 +47,7 @@ services:
     image: redis:7-alpine
     container_name: beacons_redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     networks:
