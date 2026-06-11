@@ -22,7 +22,7 @@ export default function HeroBanner() {
       <div className="container relative z-10 mx-auto px-4 text-center">
         {/* Main Slogan - Changed to font-sans per user request */}
         <h1 className="mb-6 font-sans text-5xl font-extrabold tracking-tight leading-tight sm:text-6xl md:text-7xl lg:text-8xl sm:leading-tight md:leading-tight lg:leading-30 drop-shadow-lg">
-          Thắp Sáng Niềm Tin<br className="hidden sm:block" />
+          Thắp Sáng Hy Vọng<br className="hidden sm:block" />
           <span className="text-gold">Kết Nối Tình Thân</span>
         </h1>
         
