@@ -19,7 +19,7 @@ class AuthController {
 
   login = asyncHandler(async (req: Request, res: Response) => {
     const { emailOrUsername, password } = loginRequestDto(req.body);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // await new Promise(resolve => setTimeout(resolve, 1000));
     const result = await authService.login(emailOrUsername, password);
 
     const { refreshToken, ...userData } = result;
