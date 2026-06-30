@@ -7,7 +7,7 @@
     "dev": "nodemon",
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && node --import tsx --test tests",
+    "test": "npm run typecheck && node --import tsx --test \"tests/**/*.test.ts\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
