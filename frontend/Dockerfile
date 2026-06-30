@@ -1,10 +1,12 @@
+# syntax=docker/dockerfile:1.7
 FROM node:20-alpine
 
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 

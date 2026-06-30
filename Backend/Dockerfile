@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM node:20-alpine
 
 WORKDIR /app
@@ -7,7 +8,8 @@ RUN apk add --no-cache openssl
 
 # Copy file cấu hình package và cài đặt dependencies
 COPY package*.json ./
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Copy toàn bộ mã nguồn
 COPY . .
