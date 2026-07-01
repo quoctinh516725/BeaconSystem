@@ -9,7 +9,7 @@ clients:
   - url: https://logs-prod-020.grafana.net/loki/api/v1/push
     basic_auth:
       username: '1667994'
-      password: 'glc_eyJvIjoiMTgzMTMyMSIsIm4iOiJzdGFjay0xNzEwMjA3LWhsLXdyaXRlLWRlbW8iLCJrIjoiQNU1N0g0NXNBM3oxdEVEMjA4MGhXRG1iLCJtIjp7InIiOiJwcm9kLW1hLXNvdXRoZWFzdC0xIn19'
+      password: 'glc_eyJvIjoiMTgzMTMyMSIsIm4iOiJzdGFjay0xNzEwMjA3LWhsLXdyaXRlLXRva2VuIiwiayI6Ing5MDZSeERKNU5vUzBaekVENDJNODAwbSIsIm0iOnsiciI6InByb2QtYXAtc291dGhlYXN0LTEifX0='
 
 scrape_configs:
   - job_name: docker
