@@ -1,0 +1,24 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: https://logs-prod-020.grafana.net/loki/api/v1/push
+    basic_auth:
+      username: '1667994'
+      password: 'glc_eyJvIjoiMTgzMTMyMSIsIm4iOiJzdGFjay0xNzEwMjA3LWhsLXJlYWQtdG9rZW4iLCJrIjoiN0R6Nk1CV1Z2NzBqaDYzMmZYN2dBOEs4IiwibSI6eyJyIjoicHJvZC1hcC1zb3V0aGVhc3QtMSJ9fQ=='
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'stream'

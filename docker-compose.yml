@@ -118,6 +118,19 @@ services:
     profiles:
       - tools
 
+  # Promtail - Thu thập và đẩy log lên Grafana Cloud Loki
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: beacons_promtail
+    user: "0:0"
+    volumes:
+      - ./prometheus/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - beacons_net
+    restart: unless-stopped
+
 networks:
   beacons_net:
     driver: bridge
