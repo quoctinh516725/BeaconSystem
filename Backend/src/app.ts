@@ -6,6 +6,16 @@ import { metricsMiddleware, register } from "./middlewares/metrics.middleware";
 
 const app = express();
 
+// Custom request logger middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`);
+  });
+  next();
+});
+
 // Áp dụng metrics middleware thu thập chỉ số request
 app.use(metricsMiddleware);
 
