@@ -15,7 +15,7 @@ export const options = {
 };
 
 // Lấy host mục tiêu từ biến môi trường TARGET_HOST hoặc mặc định localhost:3001
-const TARGET_HOST = __ENV.TARGET_HOST || 'http://localhost:3001';
+const TARGET_HOST = __ENV.TARGET_HOST || 'http://160.30.20.64:3001';
 
 export default function () {
   // 1. Kiểm tra Endpoint chính "/"
