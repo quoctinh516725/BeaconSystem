@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
     container_name: beacons_backend
     ports:
-      - "127.0.0.1:3001:3001"
+      - "3001:3001"
     environment:
       # Override các URL nội bộ trong docker network
       - REDIS_URL=redis://redis:6379
@@ -53,9 +53,73 @@ services:
     networks:
       - beacons_net
 
+  # Node Exporter - Giám sát tài nguyên VPS Host
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
+    container_name: beacons_node_exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - beacons_net
+    restart: unless-stopped
+
+  # Prometheus - Thu thập time-series metrics
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: beacons_prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - beacons_net
+    restart: unless-stopped
+
+  # Grafana - Giao diện dashboard trực quan hóa
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: beacons_grafana
+    ports:
+      - "3002:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - beacons_net
+    restart: unless-stopped
+
+  # k6 - Dịch vụ mô phỏng tải / load testing
+  k6:
+    image: grafana/k6:1.0.0
+    container_name: beacons_k6
+    volumes:
+      - ./k6:/app
+    environment:
+      - TARGET_HOST=http://backend:3001
+    entrypoint: ["k6", "run", "/app/load-test.js"]
+    networks:
+      - beacons_net
+    profiles:
+      - tools
+
 networks:
   beacons_net:
     driver: bridge
 
 volumes:
   redis_data:
+  prometheus_data:
+  grafana_data:
