@@ -1,0 +1,19 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'tinhnq212@gmail.com'
+  smtp_auth_username: 'tinhnq212@gmail.com'
+  smtp_auth_password: 'kbhxhlseogdqclmn'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 5m
+  receiver: 'email-receiver'
+
+receivers:
+- name: 'email-receiver'
+  email_configs:
+  - to: 'kulitivi1234@gmail.com'
+    send_resolved: true
