@@ -89,18 +89,6 @@ services:
       - beacons_net
     restart: unless-stopped
 
-  # Grafana - Giao diện dashboard trực quan hóa
-  grafana:
-    image: grafana/grafana:11.1.0
-    container_name: beacons_grafana
-    ports:
-      - "3002:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-    networks:
-      - beacons_net
-    restart: unless-stopped
-
   # k6 - Dịch vụ mô phỏng tải / load testing
   k6:
     image: grafana/k6:1.0.0
@@ -122,4 +110,3 @@ networks:
 volumes:
   redis_data:
   prometheus_data:
-  grafana_data:
